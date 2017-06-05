@@ -1,0 +1,18 @@
+<slave>
+  <name>Vagrant-Box</name>
+  <description></description>
+  <remoteFS>/home/vagrant</remoteFS>
+  <numExecutors>1</numExecutors>
+  <mode>NORMAL</mode>
+  <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
+  <launcher class="hudson.plugins.sshslaves.SSHLauncher" plugin="ssh-slaves@1.17">
+    <host>172.16.3.2</host>
+    <port>22</port>
+    <credentialsId>62ed2fc4-6e2d-41d7-b3b1-1851e63458a0</credentialsId>
+    <maxNumRetries>0</maxNumRetries>
+    <retryWaitTime>0</retryWaitTime>
+    <sshHostKeyVerificationStrategy class="hudson.plugins.sshslaves.verifiers.NonVerif
+  </launcher>
+  <label>vm</label>
+  <nodeProperties/>
+</slave>
