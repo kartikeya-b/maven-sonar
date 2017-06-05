@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.12">
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+      <triggers/>
+    </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.33">
+    <script>node(&apos;vm&apos;){
+
+    stage(&apos;Run Docker Container&apos;){
+        sh &apos;sudo docker run --name mv -d 10.150.19.24:5000/mjs:latest&apos;
+
+    }
+    stage(&apos;Git Clone&apos;)
+    {
+        sh &apos;sudo docker exec -i mv git clone https://github.com/kartikeya-b/maven-sonar.git&apos;
+    }
+    stage(&apos;Build&apos;){
+        sh &apos;sudo docker exec -i mv /bin/sh -c \&apos;cd maven-sonar;mvn clean install\&apos;&apos;
+
+    }
+    stage(&apos;SonarQube Analysis&apos;)
+    {
+       sh &apos;sudo docker exec -i mv /bin/sh -c \&apos;cd maven-sonar;mvn sonar:sonar -Dsonar.projectKey=org.sonarqube:java-simple-sq-scanner -Dsonar.projectName=Java -Dsonar.login=admin -Dsonar.password=admin -Dsonar.projectVersion=1.0 -Dsonar.language=java -Dsonar.host.url=http://172.16.3.2:9056\&apos;&apos;
+    }
+    stage(&apos;War Upload To Nexus&apos;)
+    {
+        sh &apos;sudo docker exec -i mv /bin/sh -c \&apos;cd maven-sonar;curl -u admin:admin123 -X PUT http://172.16.3.2:9053/nexus/content/repositories/releases/maven-sonar.war -T target/example-java-maven-1.0-SNAPSHOT.jar\&apos;&apos;
+    }
+    stage(&apos;Clean Contaier&apos;)
+    {
+        sh &apos;sudo docker stop mv&apos;
+        sh &apos;sudo docker rm mv&apos;
+    }
+
+}</script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>
